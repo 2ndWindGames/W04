@@ -1,5 +1,7 @@
 # SOBOK icon
 
+Current icon: concept C (Sunset), selected 2026-09-09. The image and Unity GUID are used for default and Android icons. All three concepts, the previous cream icon, and full built-in image_gen prompts are saved in resources/branding/icon-concepts/. The original generation record below refers to the previous cream icon.
+
 Built-in image_gen tool. Output: Sobok-Icon.png. Previous Volt Stack concepts are preserved.
 
 ## Final prompt
