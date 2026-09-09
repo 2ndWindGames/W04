@@ -4,6 +4,9 @@ using UnityEngine.InputSystem;
 /// <summary>A self-contained, one-button stacking game. Attach to an empty scene object.</summary>
 public sealed class StackGame : MonoBehaviour
 {
+    [SerializeField] private Material blockMaterial;
+    private bool ready;
+    private bool startupFailed;
     private const float Height = 0.35f;
     private const float Travel = 3.7f;
     private Transform tower;
@@ -24,6 +27,7 @@ public sealed class StackGame : MonoBehaviour
     private float perfectUntil;
     private bool gameOver;
     private SobokAudio sound;
+    private SobokSky sky;
     private static readonly Color[] Palette =
     {
         new Color(0.72f, 0.65f, 0.77f), new Color(0.66f, 0.74f, 0.65f),
@@ -33,7 +37,28 @@ public sealed class StackGame : MonoBehaviour
 
     private void Awake()
     {
-        material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+        try
+        {
+            InitializeGame();
+            ready = true;
+            Debug.Log("[SOBOK] Game initialized. Scene=" + gameObject.scene.name +
+                ", version=" + Application.version + ", shader=" + material.shader.name);
+        }
+        catch (System.Exception exception)
+        {
+            startupFailed = true;
+            Debug.LogError("[SOBOK] Game initialization failed on " + Application.platform);
+            Debug.LogException(exception, this);
+        }
+    }
+
+    private void InitializeGame()
+    {
+        // A serialized material keeps its shader in Android builds; Shader.Find alone does not.
+        var template = blockMaterial != null ? blockMaterial : Resources.Load<Material>("SobokBlock");
+        if (template == null || template.shader == null)
+            throw new System.InvalidOperationException("SobokBlock material or its shader is missing from the build.");
+        material = new Material(template);
         material.SetFloat("_Smoothness", 0);
         material.SetFloat("_Metallic", 0);
         sound = gameObject.AddComponent<SobokAudio>();
@@ -48,6 +73,8 @@ public sealed class StackGame : MonoBehaviour
         view.clearFlags = CameraClearFlags.SolidColor;
         view.backgroundColor = new Color(0.96f, 0.93f, 0.86f);
         view.transform.rotation = Quaternion.Euler(32, 45, 0);
+        sky = gameObject.AddComponent<SobokSky>();
+        sky.Initialize(view);
         best = PlayerPrefs.GetInt("StackGame.Best", 0);
         for (int i = 0; i < rankings.Length; i++)
             rankings[i] = PlayerPrefs.GetInt("StackGame.Rank." + i, 0);
@@ -62,6 +89,7 @@ public sealed class StackGame : MonoBehaviour
         score = 0;
         points = 0;
         energy = 0;
+        sky.SetFloor(0);
         gameOver = false;
         perfectUntil = 0;
         top = Block("Base", Vector3.zero, new Vector3(3, Height, 3), 0);
@@ -94,6 +122,7 @@ public sealed class StackGame : MonoBehaviour
 
     private void Update()
     {
+        if (!ready) return;
         bool pressed = (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
             || (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
             || (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame);
@@ -119,6 +148,7 @@ public sealed class StackGame : MonoBehaviour
             }
         }
         FollowCamera(false);
+        sound.SetNight(sky.NightAmount);
     }
 
     private void Place()
@@ -164,6 +194,7 @@ public sealed class StackGame : MonoBehaviour
 
         top = moving;
         score++;
+        sky.SetFloor(score);
         points += 10 * Multiplier;
         if (points > best)
         {
@@ -192,13 +223,14 @@ public sealed class StackGame : MonoBehaviour
     private void Overcharge()
     {
         if (energy < 3) return;
+        if (top.localScale.x >= 3 && top.localScale.z >= 3) return;
         energy -= 3;
         var size = top.localScale;
         size.x = Mathf.Min(3, size.x + 0.6f);
         size.z = Mathf.Min(3, size.z + 0.6f);
         top.localScale = size;
         moving.localScale = size;
-        sound.Placement(true);
+        sound.Restore();
         Illuminate(top);
     }
 
@@ -253,6 +285,13 @@ public sealed class StackGame : MonoBehaviour
 
     private void OnGUI()
     {
+        if (!ready)
+        {
+            if (startupFailed)
+                GUI.Box(new Rect(20, Screen.height * .45f, Screen.width - 40, 70),
+                    "SOBOK could not start. Please restart the app.");
+            return;
+        }
         // Scale a small HUD consistently for desktop and phone resolutions.
         float scale = Mathf.Min(Screen.width / 480f, Screen.height / 720f);
         var previousMatrix = GUI.matrix;
@@ -260,12 +299,12 @@ public sealed class StackGame : MonoBehaviour
         float width = Screen.width / scale;
         float height = Screen.height / scale;
         var label = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 18 };
-        label.normal.textColor = new Color(0.35f, 0.32f, 0.40f);
+        label.normal.textColor = sky.Ink;
         GUI.Label(new Rect(0, 28, width, 30), "S O B O K", label);
         label.fontSize = 64;
         GUI.Label(new Rect(0, 60, width, 85), score.ToString(), label);
         label.fontSize = 16;
-        GUI.Label(new Rect(0, 145, width, 30), "one quiet moment at a time", label);
+        GUI.Label(new Rect(0, 145, width, 30), sky.TimeLabel + "  /  one quiet moment at a time", label);
         label.fontSize = 22;
         if (gameOver)
         {
@@ -273,6 +312,7 @@ public sealed class StackGame : MonoBehaviour
             GUI.Label(new Rect(0, 195, width, 30), "Little memories  /  " + points + " points", label);
             for (int i = 0; i < rankings.Length; i++)
                 GUI.Label(new Rect(0, 228 + i * 28, width, 28), (i + 1) + ".   " + rankings[i], label);
+            label.normal.textColor = new Color(.96f,.94f,.88f);
             GUI.Label(new Rect(0, height - 160, width, 40), "A little pause.", label);
             label.fontSize = 17;
             GUI.Label(new Rect(0, height - 112, width, 35), "Tap when you are ready to begin again", label);
@@ -284,16 +324,21 @@ public sealed class StackGame : MonoBehaviour
             var charge = ChargeRect;
             charge = new Rect(charge.x / scale, charge.y / scale, charge.width / scale, charge.height / scale);
             var oldColor = GUI.color;
-            GUI.color = new Color(0.84f, 0.86f, 0.78f);
+            GUI.color = Color.Lerp(new Color(.84f,.86f,.78f), new Color(.23f,.29f,.38f), sky.NightAmount);
             GUI.DrawTexture(charge, Texture2D.whiteTexture);
             GUI.color = oldColor;
             label.fontSize = 16;
-            GUI.Label(charge, energy >= 3 ? "A little room  [E]  /  " + energy + " lights" : "Gathering light  " + energy + "/3", label);
+            bool fullWidth = top.localScale.x >= 3 && top.localScale.z >= 3;
+            GUI.Label(charge, fullWidth ? "Room to spare" : energy >= 3 ? "Restore width [E]  /  3 lights" : "Gathering light  " + energy + "/3", label);
+            label.fontSize = 14;
+            label.normal.textColor = new Color(.96f,.94f,.88f);
+            GUI.Label(new Rect(0, height - 172, width, 28), "Lights " + energy + "/6   ·   Score x" + Multiplier, label);
             label.fontSize = 17;
+            label.normal.textColor = new Color(.96f,.94f,.88f);
             GUI.Label(new Rect(0, height - 75, width, 35), "Tap / Space to place  ·  M for sound", label);
         }
         label.fontSize = 11;
-        label.normal.textColor = new Color(0.45f, 0.42f, 0.48f);
+        label.normal.textColor = new Color(.92f,.91f,.86f);
         GUI.Label(new Rect(12, height - 30, width - 24, 22),
             "© 2026 SECONDWINDGAMES · CREATED BY MANGPENG", label);
         GUI.matrix = previousMatrix;

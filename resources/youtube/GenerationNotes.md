@@ -1,0 +1,7 @@
+# SecondWind Games YouTube mascot
+
+Output: secondwind-games-mascot.png. Built-in image_gen. Reference: W01/Assets/Resources/logo.png. Original logo remains unchanged.
+
+Prompt:
+
+Reimagine the supplied SECONDWIND GAMES corporate logo as a cute, distinctive gaming YouTube channel avatar. Use the source as brand reference: retain navy and sky-blue palette, the wing motif, and a recognizable small stylized numeral 2 emblem. Main subject: an adorable round little blue-and-white penguin gaming mascot with tiny wing-like flippers, a friendly happy expression, soft peach cheeks, wearing comfy navy gaming headphones and holding a compact game controller. Integrate a simple wing-shaped sky-blue crest on the headphones and a small numeral 2 badge, connecting to the original logo. Bold clean rounded navy outlines, flat matte color fills with minimal soft shading, polished charming professional mascot logo illustration, not glossy 3D, not aggressive esports. Centered bust composition, face and controller large and readable at tiny size. Pale sky blue or warm ivory clean background with at most two little playful star accents. Entire important silhouette within central 75% circular safe area. Square full bleed image intended for round YouTube profile crop. No long company-name text because it becomes unreadable at avatar size. No watermark, no YouTube logo, no mockup, no border. Output one final high quality square PNG.
