@@ -81,7 +81,8 @@ public sealed class SobokShare : MonoBehaviour
             intent.Call<AndroidJavaObject>("setType", "image/png").Dispose();
             intent.Call<AndroidJavaObject>("putExtra", "android.intent.extra.STREAM", uri).Dispose();
             intent.Call<AndroidJavaObject>("putExtra", "android.intent.extra.TEXT", caption).Dispose();
-            intent.Call<AndroidJavaObject>("setClipData", clip).Dispose();
+            // Android Intent.setClipData returns void; requesting an object fails JNI method lookup.
+            intent.Call("setClipData", clip);
             intent.Call<AndroidJavaObject>("addFlags", 1).Dispose();
             using (var chooser = intentClass.CallStatic<AndroidJavaObject>("createChooser", intent, "Share SOBOK"))
                 activity.Call("startActivity", chooser);

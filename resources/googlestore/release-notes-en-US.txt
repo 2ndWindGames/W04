@@ -1,4 +1,1 @@
-Refreshed sound and share buttons with soft, rounded icons that match SOBOK's calming scenery.
-Button colors now follow the transition from day to night.
-Sound icons clearly show whether audio is on or off.
-Share your score and tower as an image directly from the end-of-run screen.
+Fixed an issue that prevented the Android share menu from opening when sharing your score and tower image.
