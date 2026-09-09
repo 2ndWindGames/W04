@@ -43,3 +43,8 @@ TestResults/
 # Unity crash reports
 sysinfo.txt
 mono_crash.*
+
+# Local Android signing and publishing credentials
+*.keystore
+*.jks
+/.secrets/
