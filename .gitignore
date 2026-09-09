@@ -1,0 +1,43 @@
+# Unity generated folders
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# Unity-generated IDE project files
+/*.csproj
+/*.sln
+/*.slnx
+/*.unityproj
+/*.pidb
+/*.booproj
+/*.svd
+/*.pdb
+/*.mdb
+/*.opendb
+/*.VC.db
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+*.DotSettings.user
+/Assets/Plugins/Editor/JetBrains*
+
+# Visual Studio and C# build outputs
+.vs/
+[Bb]in/
+[Oo]bj/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+TestResults/
+
+# Unity crash reports
+sysinfo.txt
+mono_crash.*
