@@ -1,0 +1,9 @@
+{
+  "name": "SWGUnity2DCore",
+  "rootNamespace": "SWGUnity2DCore",
+  "references": [
+    "Unity.ugui",
+    "Unity.TextMeshPro"
+  ],
+  "autoReferenced": true
+}

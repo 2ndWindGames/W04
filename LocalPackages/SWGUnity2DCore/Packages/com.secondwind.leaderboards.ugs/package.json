@@ -1,0 +1,13 @@
+{
+  "name": "com.secondwind.leaderboards.ugs",
+  "version": "0.1.0",
+  "displayName": "Second Wind UGS Leaderboards",
+  "description": "Optional UGS leaderboard and anonymous authentication integration. The host supplies the leaderboard ID.",
+  "unity": "6000.0",
+  "dependencies": {
+    "com.unity.services.leaderboards": "2.3.4",
+    "com.unity.services.authentication": "3.7.4",
+    "com.unity.services.core": "1.18.0",
+    "com.unity.nuget.newtonsoft-json": "3.2.2"
+  }
+}

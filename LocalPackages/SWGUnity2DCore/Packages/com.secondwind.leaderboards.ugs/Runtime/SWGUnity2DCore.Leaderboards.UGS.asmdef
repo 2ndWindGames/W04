@@ -1,0 +1,10 @@
+{
+  "name": "SWGUnity2DCore.Leaderboards.UGS",
+  "rootNamespace": "SWGUnity2DCore",
+  "references": [
+    "Unity.Services.Core",
+    "Unity.Services.Authentication",
+    "Unity.Services.Leaderboards"
+  ],
+  "autoReferenced": true
+}

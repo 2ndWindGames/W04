@@ -1,0 +1,13 @@
+{
+  "name": "com.secondwind.core",
+  "version": "0.1.0",
+  "displayName": "Second Wind Core",
+  "description": "Reusable UI, audio, resource, pooling and utility code. No game or online SDK dependencies.",
+  "unity": "6000.0",
+  "dependencies": {
+    "com.unity.ugui": "2.0.0",
+    "com.unity.modules.audio": "1.0.0",
+    "com.unity.modules.ui": "1.0.0",
+    "com.unity.modules.imgui": "1.0.0"
+  }
+}
