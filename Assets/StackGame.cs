@@ -28,6 +28,8 @@ public sealed class StackGame : MonoBehaviour
     private bool gameOver;
     private SobokAudio sound;
     private SobokSky sky;
+    private SobokShare sharing;
+    private SobokShareButton shareButton;
     private static readonly Color[] Palette =
     {
         new Color(0.72f, 0.65f, 0.77f), new Color(0.66f, 0.74f, 0.65f),
@@ -62,6 +64,11 @@ public sealed class StackGame : MonoBehaviour
         material.SetFloat("_Smoothness", 0);
         material.SetFloat("_Metallic", 0);
         sound = gameObject.AddComponent<SobokAudio>();
+        sharing = gameObject.AddComponent<SobokShare>();
+        var shareCanvas = new GameObject("SOBOK Share Canvas", typeof(RectTransform));
+        shareCanvas.transform.SetParent(transform, false);
+        shareButton = shareCanvas.AddComponent<SobokShareButton>();
+        shareButton.Initialize(() => { if (gameOver && !sharing.Busy) sharing.Share(points, score); });
         tint = new MaterialPropertyBlock();
         view = Camera.main;
         if (view == null)
@@ -130,6 +137,12 @@ public sealed class StackGame : MonoBehaviour
 
         if (gameOver)
         {
+            if (sharing.Busy) return;
+            if (pressed && IsPointerInside(ShareRect))
+            {
+                // The Canvas button handles release; this press must not restart the game.
+                return;
+            }
             if (pressed && Time.unscaledTime >= restartAt) Restart();
         }
         else
@@ -210,6 +223,20 @@ public sealed class StackGame : MonoBehaviour
 
     private bool IsChargePointer()
     {
+        return IsPointerInside(ChargeRect);
+    }
+
+    private Rect ShareRect => new Rect(Screen.width * .5f - 28 * HudScale,
+        Screen.height - 229 * HudScale, 56 * HudScale, 56 * HudScale);
+
+    private void LateUpdate()
+    {
+        if (!ready) return;
+        shareButton.Refresh(ShareRect, sky.NightAmount, gameOver && !sharing.Capturing, sharing.Busy);
+    }
+
+    private bool IsPointerInside(Rect rect)
+    {
         Vector2 position;
         if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
             position = Touchscreen.current.primaryTouch.position.ReadValue();
@@ -217,7 +244,7 @@ public sealed class StackGame : MonoBehaviour
             position = Mouse.current.position.ReadValue();
         else return false;
         position.y = Screen.height - position.y;
-        return ChargeRect.Contains(position);
+        return rect.Contains(position);
     }
 
     private void Overcharge()
@@ -308,6 +335,14 @@ public sealed class StackGame : MonoBehaviour
         label.fontSize = 22;
         if (gameOver)
         {
+            if (!sharing.Capturing)
+            {
+                if (!string.IsNullOrEmpty(sharing.Status))
+                {
+                    label.fontSize = 13;
+                    GUI.Label(new Rect(0, height - 265, width, 32), sharing.Status, label);
+                }
+            }
             label.fontSize = 17;
             GUI.Label(new Rect(0, 195, width, 30), "Little memories  /  " + points + " points", label);
             for (int i = 0; i < rankings.Length; i++)

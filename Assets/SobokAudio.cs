@@ -14,6 +14,7 @@ public sealed class SobokAudio : MonoBehaviour
     private AudioLowPassFilter warmth;
     private AudioClip restore;
     private float night;
+    private SobokShare sharing;
 
     private void Awake()
     {
@@ -125,8 +126,9 @@ public sealed class SobokAudio : MonoBehaviour
 
     private void OnGUI()
     {
-        if (GUI.Button(SoundRect,
-            muted ? "Sound off" : "Sound on")) ToggleSound();
+        if (sharing == null) sharing = GetComponent<SobokShare>();
+        if (sharing != null && sharing.Capturing) return;
+        if (SobokHudImages.SoundButton(SoundRect, muted, night)) ToggleSound();
     }
 
     private Rect SoundRect
@@ -134,7 +136,9 @@ public sealed class SobokAudio : MonoBehaviour
         get
         {
             float scale = Mathf.Min(Screen.width / 480f, Screen.height / 720f);
-            return new Rect(Screen.width - 92 * scale, 12 * scale, 80 * scale, 32 * scale);
+            Rect safe = Screen.safeArea;
+            return new Rect(safe.xMax - 60 * scale, Screen.height - safe.yMax + 12 * scale,
+                48 * scale, 48 * scale);
         }
     }
 
