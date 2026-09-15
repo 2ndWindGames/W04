@@ -1,0 +1,1 @@
+PASS: 107 assertions covering initialization; perfect light; endless play beyond 15 floors; recovery on both axes and directions; half-width restoration and cap; catch-window boundaries; duplicate input; early failure; timeout; restart cleanup; total miss; visible catch and restored screenshots.

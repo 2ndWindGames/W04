@@ -13,6 +13,9 @@ public sealed class SobokAudio : MonoBehaviour
     private bool muted;
     private AudioLowPassFilter warmth;
     private AudioClip restore;
+    private AudioClip launch;
+    private AudioClip breachBody;
+    private AudioClip breachDebris;
     private float night;
     private SobokShare sharing;
 
@@ -59,6 +62,9 @@ public sealed class SobokAudio : MonoBehaviour
         AddNote(restoreSamples, .22f, 64, .14f, 2.4f);
         AddNote(restoreSamples, .44f, 67, .12f, 2.4f);
         restore = Clip("Room to breathe", restoreSamples);
+        launch = Clip("Tower launch - rising air", LaunchSamples());
+        breachBody = Clip("Breach - low impact", BreachSamples(false));
+        breachDebris = Clip("Breach - fractured edges", BreachSamples(true));
         music.clip = loop;
         music.loop = true;
         music.volume = 0.45f;
@@ -94,7 +100,90 @@ public sealed class SobokAudio : MonoBehaviour
 
     public void Placement(bool precise) => effects.PlayOneShot(precise ? chime : tap);
     public void Restore() => effects.PlayOneShot(restore);
+    public void Launch() => effects.PlayOneShot(launch, .85f);
+
+    /// <summary>The wall always lands with weight; a more damaged tower sheds louder fragments.</summary>
+    public void Breach(float retainedRatio)
+    {
+        float retained = float.IsNaN(retainedRatio) ? 0 : Mathf.Clamp01(retainedRatio);
+        effects.PlayOneShot(breachBody, .95f);
+        effects.PlayOneShot(breachDebris, Mathf.Lerp(.65f, .18f, retained));
+    }
+
     public void SetNight(float amount) => night = amount;
+
+    private static float[] LaunchSamples()
+    {
+        const float duration = .42f;
+        var samples = new float[Mathf.RoundToInt(Rate * duration)];
+        var noise = new System.Random(7041);
+        float air = 0;
+        float phase = 0;
+        for (int i = 0; i < samples.Length; i++)
+        {
+            float t = i / (float)Rate;
+            float progress = t / duration;
+            float white = (float)noise.NextDouble() * 2 - 1;
+            air += (white - air) * Mathf.Lerp(.06f, .42f, progress);
+            phase += 2 * Mathf.PI * Mathf.Lerp(130, 680, progress * progress) / Rate;
+            float attack = Mathf.Clamp01(t / .025f);
+            float release = Mathf.Clamp01((duration - t) / .055f);
+            float envelope = attack * release * Mathf.Lerp(.30f, 1, progress);
+            // A filtered air rush and rising body give the tower motion without a piercing whistle.
+            float value = (air * 1.15f + Mathf.Sin(phase) * .22f) * envelope;
+            samples[i] = value / (1 + Mathf.Abs(value) * .4f);
+        }
+        return samples;
+    }
+
+    private static float[] BreachSamples(bool fragments)
+    {
+        const float duration = .68f;
+        var samples = new float[Mathf.RoundToInt(Rate * duration)];
+        var noise = new System.Random(fragments ? 319 : 117);
+        float bodyPhase = 0;
+        float filtered = 0;
+        float previous = 0;
+        for (int i = 0; i < samples.Length; i++)
+        {
+            float t = i / (float)Rate;
+            float white = (float)noise.NextDouble() * 2 - 1;
+            filtered += (white - filtered) * (fragments ? .38f : .16f);
+            float attack = Mathf.Clamp01(t / .0015f);
+            float tail = Mathf.Clamp01((duration - t) / .09f);
+            float value;
+            if (fragments)
+            {
+                // Several shrinking grains sound like separated chips rather than continuous hiss.
+                float grains = Mathf.Exp(-22 * t);
+                grains += Grain(t, .065f, 43) * .75f;
+                grains += Grain(t, .145f, 37) * .47f;
+                grains += Grain(t, .245f, 31) * .28f;
+                grains += Grain(t, .365f, 28) * .13f;
+                float crisp = filtered - previous * .58f;
+                value = crisp * grains * 1.7f;
+            }
+            else
+            {
+                // A rapid pitch drop gives a solid, low strike, with a short gritty contact transient.
+                bodyPhase += 2 * Mathf.PI * (54 + 155 * Mathf.Exp(-20 * t)) / Rate;
+                float body = (Mathf.Sin(bodyPhase) + Mathf.Sin(bodyPhase * 1.91f) * .16f)
+                    * Mathf.Exp(-8.5f * t) * .72f;
+                float contact = filtered * Mathf.Exp(-24 * t) * 1.3f;
+                value = body + contact;
+            }
+            previous = filtered;
+            value *= attack * tail;
+            samples[i] = value / (1 + Mathf.Abs(value) * .4f);
+        }
+        return samples;
+    }
+
+    private static float Grain(float time, float start, float decay)
+    {
+        float elapsed = time - start;
+        return elapsed < 0 ? 0 : Mathf.Clamp01(elapsed / .001f) * Mathf.Exp(-elapsed * decay);
+    }
 
     private static void AddPad(float[] samples, float start, int midi, float duration)
     {
@@ -160,5 +249,8 @@ public sealed class SobokAudio : MonoBehaviour
         Destroy(tap);
         Destroy(chime);
         Destroy(restore);
+        Destroy(launch);
+        Destroy(breachBody);
+        Destroy(breachDebris);
     }
 }

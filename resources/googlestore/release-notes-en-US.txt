@@ -1,1 +1,1 @@
-Fixed an issue that prevented the Android share menu from opening when sharing your score and tower image.
+A fresh look for SOBOK! Our new sunset-inspired app icon features the thin, colorful blocks you stack in the game, with stronger contrast to stand out on your home screen.

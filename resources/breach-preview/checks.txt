@@ -1,0 +1,1 @@
+PASS: 200 assertions covering placement overlap, preserved slab shape, the five-block launch gate, clean/partial/fatal wall intersections, support continuity, one-time impact scoring, salvage catch/timeout, recovered material use, continued stacking on the surviving tower, restart from every phase, and three real player screenshots.
