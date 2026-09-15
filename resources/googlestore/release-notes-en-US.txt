@@ -1,1 +1,5 @@
-A fresh look for SOBOK! Our new sunset-inspired app icon features the thin, colorful blocks you stack in the game, with stronger contrast to stand out on your home screen.
+Explore five ways to play SOBOK!
+- Choose Original Stack, Flower Garden, Wall Breach, Tower Bridge, or Tower Battle.
+- Grow a 15-floor garden, launch through walls, cross five gaps, or defeat three rival towers.
+- Switch games from the selection menu and restart whenever you like.
+- Added visuals and sound effects for the new modes.

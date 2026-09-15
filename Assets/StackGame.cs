@@ -134,6 +134,8 @@ public sealed class StackGame : MonoBehaviour
         FollowCamera(true);
     }
 
+    public void RestartRun() => Restart();
+
     private Transform Box(string title, Transform parent, Vector3 position, Vector3 size, Color color)
     {
         GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -211,7 +213,7 @@ public sealed class StackGame : MonoBehaviour
         bool tapped = (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
             || (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
             || (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame);
-        if (sound.IsSoundPointer()) tapped = false;
+        if (sound.IsSoundPointer() || SobokArcadeHub.BlocksGameplayInput()) tapped = false;
         float now = Time.unscaledTime;
         switch (state)
         {
@@ -497,21 +499,21 @@ public sealed class StackGame : MonoBehaviour
         float width = Screen.width / scale, height = Screen.height / scale;
         var text = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 17 };
         text.normal.textColor = sky.Ink;
-        GUI.Label(new Rect(0, 22, width, 30), "S O B O K   /   B R E A C H", text);
+        GUI.Label(new Rect(0, 59, width, 27), "S O B O K   /   B R E A C H", text);
         string headline = state == RunState.Building ? placedThisRound + " / 5"
             : state == RunState.Ready ? "READY TO FIRE"
             : state == RunState.GameOver ? "RUN ENDED"
             : state == RunState.Launching ? "BREAK THROUGH"
             : "WALL " + wallsCleared + " CLEARED";
-        text.fontSize = 38;
-        GUI.Label(new Rect(0, 58, width, 50), headline, text);
+        text.fontSize = 32;
+        GUI.Label(new Rect(0, 87, width, 44), headline, text);
         text.fontSize = 14;
         int shownWall = state == RunState.Building || state == RunState.Ready || (state == RunState.Launching && !impactResolved)
             ? wallsCleared + 1 : wallsCleared;
-        GUI.Label(new Rect(0, 112, width, 25), "WALL " + shownWall.ToString("00") + "     " + points + " PTS     BEST " + best, text);
+        GUI.Label(new Rect(0, 130, width, 25), "WALL " + shownWall.ToString("00") + "     " + points + " PTS     BEST " + best, text);
         text.fontSize = 13;
         if (state == RunState.Building || state == RunState.Ready)
-            GUI.Label(new Rect(0, 143, width, 28), "Read the opening. Shape your tower.", text);
+            GUI.Label(new Rect(0, 155, width, 26), "Read the opening. Shape your tower.", text);
         if (share.Capturing) { GUI.matrix = previous; return; }
         if (state == RunState.GameOver && !string.IsNullOrEmpty(share.Status))
             GUI.Label(new Rect(24, height - 224, width - 48, 28), share.Status, text);

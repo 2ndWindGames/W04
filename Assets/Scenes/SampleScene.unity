@@ -434,7 +434,7 @@ GameObject:
   - component: {fileID: 900100002}
   - component: {fileID: 900100003}
   m_Layer: 0
-  m_Name: Power Tower Game
+  m_Name: SOBOK Five Game Selection
   m_TagString: Untagged
   m_IsActive: 1
 --- !u!4 &900100002
@@ -459,10 +459,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 900100001}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 413e809f99d04f9fa812b0bc56a078d1, type: 3}
+  m_Script: {fileID: 11500000, guid: b775b756cebb4f95b70a477f755950ae, type: 3}
   m_Name:
   m_EditorClassIdentifier:
-  blockMaterial: {fileID: 2100000, guid: 3debb862753d423cb34579882990f105, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

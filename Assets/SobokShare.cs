@@ -11,10 +11,15 @@ public sealed class SobokShare : MonoBehaviour
 
     public void Share(int points, int walls)
     {
-        if (!Busy) StartCoroutine(CaptureAndShare(points, walls));
+        Share(points, walls, "walls cleared");
     }
 
-    private IEnumerator CaptureAndShare(int points, int walls)
+    public void Share(int points, int progress, string unit)
+    {
+        if (!Busy) StartCoroutine(CaptureAndShare(points, progress, unit));
+    }
+
+    private IEnumerator CaptureAndShare(int points, int progress, string unit)
     {
         Busy = Capturing = true;
         Status = "";
@@ -39,7 +44,7 @@ public sealed class SobokShare : MonoBehaviour
             string path = Path.Combine(directory, "SOBOK-" + Guid.NewGuid().ToString("N") + ".png");
             File.WriteAllBytes(path, screenshot.EncodeToPNG());
 #if UNITY_ANDROID && !UNITY_EDITOR
-            string caption = "SOBOK · " + walls + " walls cleared · " + points + " points";
+            string caption = "SOBOK · " + progress + " " + unit + " · " + points + " points";
             OpenAndroidShare(path, caption);
 #else
             Status = "Screenshot saved. Android opens the share menu.";

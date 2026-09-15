@@ -1,0 +1,7 @@
+PASS: 289 assertions
+Original: clipping, perfect placements, paid width restoration, loss, hub retry, endless score.
+Garden: imperfect blooms, retry cleanup, fifteen-floor finish, sixty-five flowers, completed input gate.
+Breach: five-placement launch gate, real width clipping, one-time scoring, reclaim timing, material reuse, hub retry.
+Bridge: empty launch gate, actual shortfall and stack loss, rotated bridge geometry, five increasing gold crossings, victory and retry.
+Battle: five-attempt gate, lost shots, repeated counterattack immunity, health depletion, perfect volleys, three-enemy victory, retry.
+Six real player screenshots captured. Five modes returned to the menu without duplicate active audio, skies, cameras, or game controllers.
